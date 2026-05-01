@@ -46,4 +46,4 @@ index.html dosyasını tarayıcıda aç, başka bir şey gerekmiyor.
 
 ## 👨‍💻 Geliştirici
 
-**Adın Soyadın** — WebCraft Projesi 2025
+**Şeyma Kelleci** — WebCraft Projesi 2026
