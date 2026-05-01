@@ -6,13 +6,15 @@ JavaScript, HTML ve CSS bilgilerini test eden interaktif bir quiz uygulaması.
 
 ## 🚀 Canlı Demo
 
-👉 [webcraft-mini-quiz'i oyna](https://KULLANICI_ADIN.github.io/webcraft-mini-quiz)
-
+👉 [WebCraft Mini Quiz'i oyna](https://symkllci.github.io/WebCraft-MiniQuiz)
 ---
 
 ## 📸 Önizleme
 
-> Buraya ekran görüntüsü ekle
+![Önizleme](screenshot.png)
+![Önizleme2](screenshot1.png)
+![Önizleme3](screenshot2.png)
+![Önizleme4](screenshot3.png)
 
 ---
 
