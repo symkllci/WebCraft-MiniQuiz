@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Quiz</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background: linear-gradient(135deg, #fff7ed, #eff6ff); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px 12px; color: #1e293b; }
+        .app { width: min(560px, 100%); }
+        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+        .topbar { padding: 12px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #f97316; }
+        .badges { display: flex; gap: 6px; align-items: center; }
+        .badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; }
+        .score-badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .prog { height: 3px; background: #f1f5f9; }
+        .prog-fill { height: 100%; background: linear-gradient(90deg,#f97316,#3b82f6); transition: width .3s; }
+        .body { padding: 18px 16px; }
+        .timer-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .tbar { flex: 1; height: 6px; border-radius: 999px; background: #f1f5f9; overflow: hidden; }
+        .tbar-fill { height: 100%; border-radius: 999px; transition: width .9s linear, background .3s; }
+        .tnum { font-size: 12px; font-weight: 700; color: #64748b; min-width: 20px; text-align: center; }
+        .qtext { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 14px; }
+        .options { display: flex; flex-direction: column; gap: 8px; }
+        button.opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; transition: all .15s; width: 100%; }
+        button.opt:hover:not([disabled]) { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+        button.opt[disabled] { cursor: not-allowed; opacity: 0.7; }
+        .ltr { width: 24px; height: 24px; border-radius: 6px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; color: #64748b; }
+        button.opt.correct { background: #f0fdf4; border-color: #86efac; }
+        button.opt.correct .ltr { background: #16a34a; color: #fff; }
+        button.opt.wrong { background: #fef2f2; border-color: #fca5a5; }
+        button.opt.wrong .ltr { background: #dc2626; color: #fff; }
+        .foot { padding: 10px 16px; border-top: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: space-between; }
+        .note { font-size: 11px; font-weight: 600; color: #94a3b8; }
+        .btn-row { display: flex; gap: 6px; }
+        .btn { font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; color: #1e293b; cursor: pointer; transition: all .15s; }
+        .btn:hover { background: #f1f5f9; }
+        .btn.primary { background: linear-gradient(90deg,#f97316,#3b82f6); border: none; color: #fff; cursor: pointer; }
+        .btn.primary:hover { opacity: .9; }
+        .start-body { padding: 30px 16px; text-align: center; }
+        .start-title { font-size: 20px; font-weight: 700; color: #f97316; margin-bottom: 6px; }
+        .start-sub { font-size: 12px; color: #64748b; margin-bottom: 20px; line-height: 1.6; }
+        .cat-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+        .cat-btn { font-size: 12px; font-weight: 700; padding: 7px 18px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; cursor: pointer; }
+        .cat-btn.on { background: #fff7ed; border-color: #fed7aa; color: #ea580c; }
+        .hs-note { font-size: 11px; color: #94a3b8; margin-top: 10px; }
+        .res-body { padding: 24px 16px; }
+        .res-badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 999px; margin-bottom: 8px; }
+        .res-score { font-size: 44px; font-weight: 700; color: #f97316; line-height: 1; margin-bottom: 4px; }
+        .res-sub { font-size: 12px; color: #64748b; margin-bottom: 14px; }
+        .hs-box { display: flex; align-items: center; padding: 8px 12px; border-radius: 8px; background: #fff7ed; border: 1px solid #fed7aa; margin-bottom: 14px; }
+        .hs-label { font-size: 11px; font-weight: 700; color: #ea580c; }
+        .hs-val { font-size: 12px; font-weight: 700; color: #ea580c; margin-left: auto; }
+        .rev-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 240px; overflow-y: auto; }
+        .rev-item { padding: 8px 10px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; }
+        .rev-item.correct { background: #f0fdf4; border-color: #86efac; }
+        .rev-item.wrong { background: #fef2f2; border-color: #fca5a5; }
+        .rev-q { font-size: 11px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
+        .rev-a { font-size: 10px; font-weight: 600; color: #64748b; }
+        .rev-a span.ok { color: #16a34a; }
+        .rev-a span.bad { color: #dc2626; }
+    </style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+
+    <!-- başlangıç ekranı -->
+    <div id="startView">
+      <div class="topbar">
+        <span class="logo">MINI QUIZ Uygulaması</span>
+        <span class="badge" id="hsChip">En iyi: -</span>
+      </div>
+      <div class="start-body">
+        <div class="start-title">Bilgini Test Et</div>
+        <div class="start-sub">Kategori seç · 5er soru · 15 sn/soru<br>Hızlı cevapla = daha çok puan</div>
+        <div class="cat-row" id="catRow"></div>
+        <button class="btn primary" onclick="baslat()" style="padding:9px 32px;">Baslat</button>
+        <div class="hs-note" id="hsNote"></div>
+      </div>
+    </div>
+
+    <!-- soru ekranı -->    
+    <div id="quizView" style="display:none">
+      <div class="topbar">
+        <span class="logo">MINI QUIZ</span>
+        <div class="badges">
+          <span class="badge" id="catChip">JS</span>
+          <span class="badge" id="qChip">1/5</span>
+          <span class="score-badge" id="scoreChip">0 puan</span>
+        </div>
+      </div>
+      <div class="prog"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="body">
+        <div class="timer-row">
+          <div class="tbar"><div class="tbar-fill" id="tFill" style="width:100%"></div></div>
+          <div class="tnum" id="tNum">15</div>
+        </div>
+        <div class="qtext" id="qText"></div>
+        <div class="options" id="optsEl"></div>
+      </div>
+      <div class="foot">
+        <span class="note" id="noteEl">Bir seçeneğe tıkla.</span>
+        <div class="btn-row">
+          <button class="btn" onclick="atla()">Atla</button>
+          <!-- disabled calışmadı, pointer-events ile çözdüm -->
+          <button class="btn primary" id="nextBtn" onclick="sonraki()" style="opacity:0.4;pointer-events:none;">Sonraki</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- sonuç ekranı -->
+    <div id="resView" style="display:none">
+      <div class="topbar">
+        <span class="logo"> MINI QUIZ</span>
+        <span class="badge" id="resCat"></span>
+      </div>
+      <div class="res-body">
+        <div class="res-badge" id="resBadge"></div>
+        <div class="res-score" id="resScore">0</div>
+        <div class="res-sub" id="resSub"></div>
+        <div class="hs-box">
+          <span class="hs-label">En yüksek skor</span>
+          <span class="hs-val" id="hsVal">-</span>
+        </div>
+        <div class="rev-list" id="revList"></div>
+        <button class="btn primary" onclick="yenidenBasla()" style="width:100%;padding:10px;">Tekrar Oyna</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    // soru bankası - her kategoriden 5 tane
+    var SORULAR = {
+        JavaScript: [
+            { q: "Degişken tanımlamak için hangisi kullanılır?", opts: ["print", "let", "SELECT", "main()"], ans: 1 },
+            { q: "console.log() ne işe yarar?", opts: ["Tarayıcıyı kapatır", "Sayfayı yeniler", "Konsola çıktı yazar", "Değişken siler"], ans: 2 },
+            { q: "'===' neyi kontrol eder?", opts: ["Sadece değer", "Sadece tur", "Değer ve tur", "Hiçbirini"], ans: 2 },
+            { q: "DOM'da element seçmek için?", opts: ["document.find()", "document.get()", "document.querySelector()", "document.select()"], ans: 2 },
+            { q: "Sabit tanımlamak için hangi keyword?", opts: ["var", "let", "const", "static"], ans: 2 }
+        ],
+        HTML: [
+            { q: "Bağlantı etiketi hangisidir?", opts: ["div", "link", "a", "href"], ans: 2 },
+            { q: "Resim için hangi etiket?", opts: ["image", "img", "pic", "src"], ans: 1 },
+            { q: "Yorum satırı nasıl yazılır?", opts: ["// yorum", "/* yorum */", "<!-- yorum -->", "# yorum"], ans: 2 },
+            { q: "Kalın metin için hangi etiket?", opts: ["i", "u", "bold", "strong"], ans: 3 },
+            { q: "Sırasiz liste için hangi etiket?", opts: ["ol", "list", "ul", "li"], ans: 2 }
+        ],
+        CSS: [
+            { q: "Sınıf seçici nasıl yazılır?", opts: [".class", "#class", "@class", "*class"], ans: 0 },
+            { q: ":hover ne zaman çalışır?", opts: ["Tıklandığında", "Fare üzerine gelince", "Sayfa yüklenince", "Silinince"], ans: 1 },
+            { q: "box-sizing: border-box ne sağlar?", opts: ["Kenarlık rengi", "Padding+border genişliğe dahil", "Gölge ekler", "Box modeli kaldırır"], ans: 1 },
+            { q: "rem birimi neye göre hesaplanır?", opts: ["Parent", "Viewport", "Root font-size", "DPI"], ans: 2 },
+            { q: "!important ne anlama gelir?", opts: ["Hatalı kural", "Düşük öncelik", "Diğer kuralları geçersiz kılar", "Yorum"], ans: 2 }
+        ]
+    };
+
+    var KATEGORILER = Object.keys(SORULAR);
+    var SURE = 15;
+
+    // oyun değişkenleri
+    var aktifKatlar = KATEGORILER.slice();
+    var sorular = [];
+    var siradaki = 0;
+    var puan = 0;
+    var cevaplandi = false;
+    var kalanSure = 15; // bunu neden burada tanımladım bilmiyorum ama çalışıyor
+    var sayac = null;
+    var gecmis = [];
+
+    // localstorage - en yüksek skoru saklamak için
+    function getHS(k) {
+        try { var v = localStorage.getItem("q_" + k); return v ? parseInt(v) : null; } catch(e) { return null; }
+    }
+    function setHS(k, v) {
+        try { var cur = getHS(k); if (!cur || v > cur) localStorage.setItem("q_" + k, v); } catch(e) {}
+    }
+
+    // diziyi karıştır
+    function karistir(dizi) {
+        return dizi.slice().sort(function() { return Math.random() - 0.5; });
+    }
+
+    // sonraki butonu aktif/pasif yap
+    // TODO: bunu daha iyi bir yontemle yapmak lazim sonra tekrar bakacağım
+    function sonrakiAktif(durum) {
+        var btn = document.getElementById("nextBtn");
+        if (durum) {
+            btn.style.opacity = "1";
+            btn.style.pointerEvents = "auto";
+        } else {
+            btn.style.opacity = "0.4";
+            btn.style.pointerEvents = "none";
+        }
+    }
+
+    // kategori butonlarını oluştur
+    function katGuncelle() {
+        var satir = document.getElementById("catRow");
+        satir.innerHTML = "";
+        KATEGORILER.forEach(function(k) {
+            var btn = document.createElement("button");
+            btn.className = "cat-btn" + (aktifKatlar.indexOf(k) !== -1 ? " on" : "");
+            btn.textContent = k;
+            btn.onclick = function() {
+                var i = aktifKatlar.indexOf(k);
+                if (i !== -1) { if (aktifKatlar.length > 1) aktifKatlar.splice(i, 1); }
+                else aktifKatlar.push(k);
+                katGuncelle();
+            };
+            satir.appendChild(btn);
+        });
+        var en = aktifKatlar.map(getHS).filter(function(x) { return x !== null; });
+        document.getElementById("hsChip").textContent = en.length ? "En iyi: " + Math.max.apply(null, en) + " puan" : "En iyi: -";
+        document.getElementById("hsNote").textContent = aktifKatlar.join(" + ") + " - " + (aktifKatlar.length * 5) + " soru";
+    }
+    katGuncelle();
+
+    // başlat butonuna basılınca
+    function baslat() {
+        var havuz = [];
+        aktifKatlar.forEach(function(k) {
+            karistir(SORULAR[k]).forEach(function(s) {
+                havuz.push({ q: s.q, opts: s.opts, ans: s.ans, kat: k });
+            });
+        });
+
+        // soruları ve şıkları karıştır
+        sorular = karistir(havuz).map(function(s) {
+            var so = karistir(s.opts.map(function(o, i) { return { t: o, oi: i }; }));
+            return { q: s.q, opts: so, ans: so.findIndex(function(o) { return o.oi === s.ans; }), kat: s.kat };
+        });
+
+        siradaki = 0; puan = 0; gecmis = [];
+        document.getElementById("startView").style.display = "none";
+        document.getElementById("quizView").style.display  = "block";
+        soruGoster();
+    }
+
+    // soruyu ekrana çiz
+    function soruGoster() {
+        var s = sorular[siradaki];
+        var toplam = sorular.length;
+
+        document.getElementById("qChip").textContent     = (siradaki + 1) + "/" + toplam;
+        document.getElementById("scoreChip").textContent = puan + " puan";
+        document.getElementById("catChip").textContent   = s.kat;
+        document.getElementById("progFill").style.width  = Math.round(siradaki / toplam * 100) + "%";
+        document.getElementById("qText").textContent     = s.q;
+
+        // Şıkları temizle ve yeniden oluştur
+        var optsEl = document.getElementById("optsEl");
+        optsEl.innerHTML = "";
+        s.opts.forEach(function(opt, i) {
+            var btn = document.createElement("button");
+            btn.className = "opt";
+            btn.innerHTML = '<span class="ltr">' + String.fromCharCode(65 + i) + '</span>' + opt.t;
+            btn.onclick = function() { cevapSec(i, btn); };
+            optsEl.appendChild(btn);
+        });
+
+        cevaplandi = false;
+        sonrakiAktif(false);
+        document.getElementById("noteEl").textContent = "Bir seçeneğe tıkla.";
+        sayacBaslat();
+    }
+
+    // geri sayım başlat
+    function sayacBaslat() {
+        clearInterval(sayac);
+        kalanSure = SURE;
+        sayacGuncelle();
+        sayac = setInterval(function() {
+            kalanSure--;
+            sayacGuncelle();
+            if (kalanSure <= 0) { clearInterval(sayac); if (!cevaplandi) sureDoldu(); }
+        }, 1000);
+    }
+
+    // timer görünümünü güncelleme yaptım
+    function sayacGuncelle() {
+        document.getElementById("tNum").textContent  = kalanSure;
+        document.getElementById("tFill").style.width = (kalanSure / SURE * 100) + "%";
+        // renk degişimi: mavi > turuncu > kırmızı
+        document.getElementById("tFill").style.background = kalanSure <= 5 ? "#dc2626" : kalanSure <= 10 ? "#f97316" : "#3b82f6";
+    }
+
+    // süre dolunca çağrılıyor
+    function sureDoldu() {
+        cevaplandi = true;
+        var s = sorular[siradaki];
+        document.getElementById("optsEl").querySelectorAll(".opt").forEach(function(b, i) {
+            b.disabled = true;
+            if (i === s.ans) b.classList.add("correct");
+        });
+        document.getElementById("noteEl").textContent = "Süre doldu!";
+        gecmis.push({ q: s.q, kat: s.kat, dogru: false, cevap: s.opts[s.ans].t, secilen: null });
+        sonrakiAktif(true);
+    }
+
+    // kullanıcı bir şık seçtiği zaman
+    function cevapSec(i, btn) {
+        if (cevaplandi) return;
+        clearInterval(sayac);
+        cevaplandi = true;
+        var s  = sorular[siradaki];
+        var ok = (i === s.ans);
+
+        // doğru şıkkı yeşile boya
+        document.getElementById("optsEl").querySelectorAll(".opt").forEach(function(b, j) {
+            b.disabled = true;
+            if (j === s.ans) b.classList.add("correct");
+        });
+
+        if (ok) {
+            puan += 10 + kalanSure; // hız bonusu
+            document.getElementById("noteEl").textContent = "Doğru! +" + (10 + kalanSure) + " puan";
+        } else {
+            btn.classList.add("wrong");
+            document.getElementById("noteEl").textContent = "Yanlış";
+        }
+
+        document.getElementById("scoreChip").textContent = puan + " puan";
+        gecmis.push({ q: s.q, kat: s.kat, dogru: ok, cevap: s.opts[s.ans].t, secilen: s.opts[i].t });
+        sonrakiAktif(true);
+    }
+
+    // sonraki soruya geç
+    function sonraki() {
+        clearInterval(sayac);
+        if (siradaki < sorular.length - 1) { siradaki++; soruGoster(); }
+        else bitis();
+    }
+
+    // soruyu atla
+    function atla() {
+        clearInterval(sayac);
+        if (!cevaplandi) {
+            var s = sorular[siradaki];
+            gecmis.push({ q: s.q, kat: s.kat, dogru: false, cevap: s.opts[s.ans].t, secilen: "Atlandı" });
+        }
+        if (siradaki < sorular.length - 1) { siradaki++; soruGoster(); }
+        else bitis();
+    }
+
+    // oyun bitti
+    function bitis() {
+        clearInterval(sayac);
+        document.getElementById("progFill").style.width = "100%";
+        document.getElementById("quizView").style.display = "none";
+        document.getElementById("resView").style.display  = "block";
+
+        var toplam = sorular.length;
+        var dogru  = gecmis.filter(function(h) { return h.dogru; }).length;
+        var yuzde  = Math.round(dogru / toplam * 100);
+
+        document.getElementById("resScore").textContent = puan + " puan";
+        document.getElementById("resSub").textContent   = dogru + "/" + toplam + " doğru (%" + yuzde + ")";
+        document.getElementById("resCat").textContent   = aktifKatlar.join(" + ");
+
+        // skoru kaydet
+        aktifKatlar.forEach(function(k) { setHS(k, puan); });
+        var en = aktifKatlar.map(function(k) { return getHS(k) || 0; });
+        document.getElementById("hsVal").textContent = Math.max.apply(null, en) + " puan";
+
+        // sonuca göre rozet göster
+        var rozet = document.getElementById("resBadge");
+        if (yuzde >= 80)      { rozet.textContent = "Harika!";         rozet.style.cssText = "background:#f0fdf4;color:#16a34a;border-radius:999px;padding:4px 14px;display:inline-block;"; }
+        else if (yuzde >= 50) { rozet.textContent = "İyi gidiyorsun!"; rozet.style.cssText = "background:#fff7ed;color:#ea580c;border-radius:999px;padding:4px 14px;display:inline-block;"; }
+        else                  { rozet.textContent = "Daha çok çalış!"; rozet.style.cssText = "background:#fef2f2;color:#dc2626;border-radius:999px;padding:4px 14px;display:inline-block;"; }
+
+        // doğru yanlış listesi
+        var liste = document.getElementById("revList");
+        liste.innerHTML = "";
+        gecmis.forEach(function(h) {
+            var d = document.createElement("div");
+            d.className = "rev-item " + (h.dogru ? "correct" : "wrong");
+            d.innerHTML = '<div class="rev-q">' + h.q + '</div>'
+                + '<div class="rev-a">'
+                + (h.dogru
+                    ? 'Dogru: <span class="ok">' + h.cevap + '</span>'
+                    : 'Senin: <span class="bad">' + (h.secilen || "Cevapsız") + '</span> · Dogru: <span class="ok">' + h.cevap + '</span>')
+                + '</div>';
+            liste.appendChild(d);
+        });
+    }
+
+    // tekrar oyna
+    function yenidenBasla() {
+        document.getElementById("resView").style.display   = "none";
+        document.getElementById("startView").style.display = "block";
+        katGuncelle();
+    }
+</script>
+</body>
+</html>
