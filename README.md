@@ -7,6 +7,7 @@ JavaScript, HTML ve CSS bilgilerini test eden interaktif bir quiz uygulaması.
 ## 🚀 Canlı Demo
 
 👉 [WebCraft Mini Quiz'i oyna](https://symkllci.github.io/WebCraft-MiniQuiz)
+
 ---
 
 ## 📸 Önizleme
@@ -25,6 +26,7 @@ JavaScript, HTML ve CSS bilgilerini test eden interaktif bir quiz uygulaması.
 - ⚡ **Hız bonusu** — ne kadar hızlı cevaplarsan o kadar çok puan
 - 🔀 **Sorular karışıyor** — her oyunda farklı sıra
 - 🏆 **Highscore** — en iyi skor tarayıcıda saklanıyor
+- ⏭️ **Atla & Sonraki** — soruyu atlayabilir veya cevapladıktan sonra geçebilirsin
 - 📊 **Sonuç özeti** — hangi soruyu doğru/yanlış yaptığını gösteriyor
 
 ---
@@ -35,12 +37,6 @@ JavaScript, HTML ve CSS bilgilerini test eden interaktif bir quiz uygulaması.
 - CSS3
 - Vanilla JavaScript
 - localStorage
-
----
-
-## 📁 Kurulum
-
-index.html dosyasını tarayıcıda aç, başka bir şey gerekmiyor.
 
 ---
 
